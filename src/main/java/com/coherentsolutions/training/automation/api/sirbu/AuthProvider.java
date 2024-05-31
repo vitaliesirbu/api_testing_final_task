@@ -1,11 +1,15 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
 
 public class AuthProvider {
     private static AuthProvider instance;
@@ -38,25 +42,27 @@ public class AuthProvider {
         return readToken;
     }
 
-    private String requestToken(String scope) throws IOException, InterruptedException{
+    private String requestToken(String scope) throws IOException {
         String auth = clientId + ":" + clientSecret;
         String encodeAuth = Base64.getEncoder().encodeToString(auth.getBytes());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(tokenUrl))
-                .header("Authorization", "Basic " + encodeAuth)
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString("grant_type=client_credentials&scope=" + scope))
-                .build();
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost post = new HttpPost(tokenUrl);
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        post.setHeader("Authorization", "Basic " + encodeAuth);
+        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        post.setEntity(new StringEntity("grant_type=client_credentials&scope=" + scope));
 
-        if (response.statusCode() == 200){
-            String responseBody = response.body();
-            return extractTokenFromResponse(responseBody);
-        } else {
-            throw new RuntimeException("Failed  to get token: " + response.body());
+        try (CloseableHttpResponse response = client.execute(post)) {
+            if (response.getStatusLine().getStatusCode() == 200) {
+                HttpEntity entity = response.getEntity();
+                String responseBody = EntityUtils.toString(entity);
+                return extractTokenFromResponse(responseBody);
+            } else {
+                throw new RuntimeException("Failed to get token: " + EntityUtils.toString(response.getEntity()));
+            }
+        } finally {
+            client.close();
         }
     }
 
