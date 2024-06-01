@@ -2,6 +2,8 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import java.io.IOException;
 import java.util.Base64;
+
+import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -16,10 +18,13 @@ public class AuthProvider {
     private String writeToken;
     private String readToken;
 
-    private final String clientId = "0oa157tvtugfFXEhU4x7";
-    private final String clientSecret = "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq";
-    private final String tokenUrl = "http://localhost:4445/oauth/token";
-    private AuthProvider(){
+    private String clientId = "0oa157tvtugfFXEhU4x7";
+    private String clientSecret = "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq";
+    private String tokenUrl = "http://localhost:4445/oauth/token";
+    private AuthProvider() {
+        this.clientId = ConfigLoader.getProperty("clientId");
+        this.clientSecret = ConfigLoader.getProperty("clientSecret");
+        this.tokenUrl = ConfigLoader.getProperty("tokenUrl");
     }
 
     public static synchronized  AuthProvider getInstance(){
