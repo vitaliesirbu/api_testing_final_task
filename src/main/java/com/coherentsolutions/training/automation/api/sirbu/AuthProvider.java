@@ -5,6 +5,7 @@ import java.util.Base64;
 
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -18,9 +19,9 @@ public class AuthProvider {
     private String writeToken;
     private String readToken;
 
-    private String clientId = "0oa157tvtugfFXEhU4x7";
-    private String clientSecret = "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq";
-    private String tokenUrl = "http://localhost:4445/oauth/token";
+    private String clientId;
+    private String clientSecret;
+    private String tokenUrl;
     private AuthProvider() {
         this.clientId = ConfigLoader.getProperty("clientId");
         this.clientSecret = ConfigLoader.getProperty("clientSecret");
@@ -54,8 +55,8 @@ public class AuthProvider {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(tokenUrl);
 
-        post.setHeader("Authorization", "Basic " + encodeAuth);
-        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        post.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodeAuth);
+        post.setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
         post.setEntity(new StringEntity("grant_type=client_credentials&scope=" + scope));
 
         try (CloseableHttpResponse response = client.execute(post)) {
