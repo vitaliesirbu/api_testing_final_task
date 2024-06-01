@@ -1,17 +1,19 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
-import java.io.IOException;
-import java.util.Base64;
-
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
+import lombok.SneakyThrows;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.util.Base64;
 
 
 public class AuthProvider {
@@ -34,21 +36,22 @@ public class AuthProvider {
         }
         return instance;
     }
-
-    public String getWriteToken() throws IOException, InterruptedException{
+    @SneakyThrows
+    public String getWriteToken() {
         if (writeToken == null){
             writeToken = requestToken("write");
         }
         return writeToken;
     }
-    public String getReadToken() throws  IOException, InterruptedException{
+    @SneakyThrows
+    public String getReadToken() {
         if (readToken == null){
             readToken = requestToken("read");
         }
         return readToken;
     }
-
-    private String requestToken(String scope) throws IOException {
+    @SneakyThrows
+    private String requestToken(String scope) {
         String auth = clientId + ":" + clientSecret;
         String encodeAuth = Base64.getEncoder().encodeToString(auth.getBytes());
 
@@ -57,18 +60,27 @@ public class AuthProvider {
 
         post.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodeAuth);
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        post.setEntity(new StringEntity("grant_type=client_credentials&scope=" + scope));
+        post.setEntity(new StringEntity("grant_type=client_credentials&scope=" + scope, "UTF-8"));
 
         try (CloseableHttpResponse response = client.execute(post)) {
-            if (response.getStatusLine().getStatusCode() == 200) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 200) {
                 HttpEntity entity = response.getEntity();
-                String responseBody = EntityUtils.toString(entity);
+                String responseBody = EntityUtils.toString(entity, "UTF-8");
                 return extractTokenFromResponse(responseBody);
             } else {
-                throw new RuntimeException("Failed to get token: " + EntityUtils.toString(response.getEntity()));
+                throw new RuntimeException("Failed to get token. Status code: " + statusCode);
             }
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException("Client protocol exception occurred: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RuntimeException("I/O exception occurred: " + e.getMessage(), e);
         } finally {
-            client.close();
+            try {
+                client.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
