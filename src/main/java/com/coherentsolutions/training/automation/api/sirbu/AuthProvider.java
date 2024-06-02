@@ -11,7 +11,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
 import java.util.Base64;
 
 public class AuthProvider {
@@ -29,7 +28,7 @@ public class AuthProvider {
     }
 
     @SneakyThrows
-    public String getWriteToken() throws IOException {
+    public String getWriteToken() {
         if (writeToken == null) {
             writeToken = requestToken("write");
         }
@@ -37,7 +36,7 @@ public class AuthProvider {
     }
 
     @SneakyThrows
-    public String getReadToken() throws IOException {
+    public String getReadToken() {
         if (readToken == null) {
             readToken = requestToken("read");
         }
@@ -45,7 +44,7 @@ public class AuthProvider {
     }
 
     @SneakyThrows
-    private String requestToken(String scope) throws IOException {
+    private String requestToken(String scope) {
         String clientId = ConfigLoader.getProperty("clientId");
         String clientSecret = ConfigLoader.getProperty("clientSecret");
         String tokenUrl = ConfigLoader.getProperty("tokenUrl");
