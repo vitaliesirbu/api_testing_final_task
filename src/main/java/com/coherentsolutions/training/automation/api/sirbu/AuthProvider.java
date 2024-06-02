@@ -24,11 +24,7 @@ public class AuthProvider {
     private String clientId;
     private String clientSecret;
     private String tokenUrl;
-    private AuthProvider() {
-        this.clientId = ConfigLoader.getProperty("clientId");
-        this.clientSecret = ConfigLoader.getProperty("clientSecret");
-        this.tokenUrl = ConfigLoader.getProperty("tokenUrl");
-    }
+    private AuthProvider() {}
 
     public static synchronized  AuthProvider getInstance(){
         if (instance == null){
@@ -52,8 +48,12 @@ public class AuthProvider {
     }
     @SneakyThrows
     private String requestToken(String scope) {
+        String clientId = ConfigLoader.getProperty("clientId");
+        String clientSecret = ConfigLoader.getProperty("clientSecret");
+        String tokenUrl = ConfigLoader.getProperty("tokenUrl");
         String auth = clientId + ":" + clientSecret;
         String encodeAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+
 
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(tokenUrl);
