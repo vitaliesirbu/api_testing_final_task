@@ -42,9 +42,9 @@ public class ZipCodeTest {
         String readToken = authProvider.getReadToken();
 
         String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
-        String requestBody = "[\"12345fhdrhdh414\", \"67890\"]";
+        List<String> requestBody = List.of("12345", "67890");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, writeToken, requestBody);
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, writeToken, requestBody.toString());
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
@@ -69,9 +69,9 @@ public class ZipCodeTest {
         String readToken = authProvider.getReadToken();
 
         String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
-        String requestBody = "[\"12345\", \"67890\", \"12345\"]";
+        List<String> requestBody = List.of("12345", "67890", "12345");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, writeToken, requestBody);
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, writeToken, requestBody.toString());
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
@@ -97,9 +97,9 @@ public class ZipCodeTest {
         String readToken = authProvider.getReadToken();
 
         String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
-        String requestBody = "[\"12345\", \"67890\", \"12345\"]";
+        List<String> requestBody = List.of("12345", "67890", "12345");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, writeToken, requestBody);
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, writeToken, requestBody.toString());
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);

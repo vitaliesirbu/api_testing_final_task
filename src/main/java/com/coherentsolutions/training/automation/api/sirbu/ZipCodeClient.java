@@ -36,7 +36,7 @@ public class ZipCodeClient {
         }
 
         int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != 200) {
+        if (statusCode != 201) {
             throw new RuntimeException("Failed to get zip codes. Status code: " + statusCode);
         }
 
