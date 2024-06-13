@@ -19,13 +19,16 @@ public class ZipCodeClient {
 
     private final CloseableHttpClient client;
     private final ObjectMapper objectMapper;
+    private final AuthProvider authProvider;
 
     public ZipCodeClient() {
         this.client = HttpClients.createDefault();
         this.objectMapper = new ObjectMapper();
+        this.authProvider = AuthProvider.getInstance();
     }
 
-    public List<String> getZipCodes(String url, String token) throws IOException, NoResponseException {
+    public List<String> getZipCodes(String url) throws IOException, NoResponseException {
+        String token = authProvider.getReadToken();
         HttpGet get = new HttpGet(url);
         get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 
@@ -36,7 +39,7 @@ public class ZipCodeClient {
         }
 
         int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != 201) {
+        if (statusCode != 200) { // Status code 200 for successful GET request
             throw new RuntimeException("Failed to get zip codes. Status code: " + statusCode);
         }
 
@@ -45,7 +48,8 @@ public class ZipCodeClient {
     }
 
     @SneakyThrows
-    public CloseableHttpResponse postZipCodes(String url, String token, String requestBody) {
+    public CloseableHttpResponse postZipCodes(String url, String requestBody) {
+        String token = authProvider.getWriteToken();
         HttpPost post = new HttpPost(url);
         post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
