@@ -35,7 +35,7 @@ public class ZipCodeTest {
 
         String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
 
-        List<String> zipCodesList = zipCodeClient.getZipCodes(zipCodesUrl);
+        List<String> zipCodesList = zipCodeClient.getZipCodes();
         System.out.println("Current zip codes are: " + zipCodesList);
 
         Assert.assertTrue(!zipCodesList.isEmpty());
@@ -48,13 +48,13 @@ public class ZipCodeTest {
         String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
         List<String> requestBody = List.of("12345", "67890");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, requestBody.toString());
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody.toString());
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
         String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
-        List<String> zipCodesList = zipCodeClient.getZipCodes(zipCodesUrl);
+        List<String> zipCodesList = zipCodeClient.getZipCodes();
         Set<String> zipCodesSet = new HashSet<>(zipCodesList);
 
         Assert.assertTrue(zipCodesSet.contains("12345"));
@@ -68,13 +68,13 @@ public class ZipCodeTest {
         String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
         List<String> requestBody = List.of("12345", "67890", "12345");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, requestBody.toString());
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody.toString());
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
         String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
-        List<String> zipCodesList = zipCodeClient.getZipCodes(zipCodesUrl);
+        List<String> zipCodesList = zipCodeClient.getZipCodes();
         Set<String> zipCodesSet = new HashSet<>(zipCodesList);
 
         Assert.assertTrue(zipCodesSet.contains("12345"));
@@ -88,13 +88,13 @@ public class ZipCodeTest {
         String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
         List<String> requestBody = List.of("12345", "67890", "12345");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(zipCodesExpandUrl, requestBody.toString());
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody.toString());
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
         String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
-        List<String> zipCodesList = zipCodeClient.getZipCodes(zipCodesUrl);
+        List<String> zipCodesList = zipCodeClient.getZipCodes();
         Set<String> zipCodesSet = new HashSet<>(zipCodesList);
 
         Assert.assertTrue(zipCodesSet.contains("12345"));

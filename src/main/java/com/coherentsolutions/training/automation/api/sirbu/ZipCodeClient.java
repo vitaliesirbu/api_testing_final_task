@@ -1,5 +1,6 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
+import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -20,16 +21,20 @@ public class ZipCodeClient {
     private final CloseableHttpClient client;
     private final ObjectMapper objectMapper;
     private final AuthProvider authProvider;
+    private final String zipCodesUrl;
+    private final String zipCodesExpandUrl;
 
     public ZipCodeClient() {
         this.client = HttpClients.createDefault();
         this.objectMapper = new ObjectMapper();
         this.authProvider = AuthProvider.getInstance();
+        this.zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
+        this.zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
     }
 
-    public List<String> getZipCodes(String url) throws IOException, NoResponseException {
+    public List<String> getZipCodes() throws IOException, NoResponseException {
         String token = authProvider.getReadToken();
-        HttpGet get = new HttpGet(url);
+        HttpGet get = new HttpGet(zipCodesUrl);
         get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 
         CloseableHttpResponse response = client.execute(get);
@@ -48,9 +53,9 @@ public class ZipCodeClient {
     }
 
     @SneakyThrows
-    public CloseableHttpResponse postZipCodes(String url, String requestBody) {
+    public CloseableHttpResponse postZipCodes(String requestBody) {
         String token = authProvider.getWriteToken();
-        HttpPost post = new HttpPost(url);
+        HttpPost post = new HttpPost(zipCodesExpandUrl);
         post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         post.setEntity(new StringEntity(requestBody, "UTF-8"));
