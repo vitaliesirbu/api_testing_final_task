@@ -1,6 +1,5 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
-import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
@@ -31,9 +30,6 @@ public class ZipCodeTest {
     @Test
     @SneakyThrows
     public void testGetZipCodes() {
-        ZipCodeClient zipCodeClient = new ZipCodeClient();
-
-        String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
 
         List<String> zipCodesList = zipCodeClient.getZipCodes();
         System.out.println("Current zip codes are: " + zipCodesList);
@@ -45,15 +41,14 @@ public class ZipCodeTest {
     @Test
     @SneakyThrows
     public void testPostZipCodes() {
-        String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
+
         List<String> requestBody = List.of("12345", "67890");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody.toString());
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
-        String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
         List<String> zipCodesList = zipCodeClient.getZipCodes();
         Set<String> zipCodesSet = new HashSet<>(zipCodesList);
 
@@ -65,15 +60,14 @@ public class ZipCodeTest {
     @Test
     @SneakyThrows
     public void testExpandZipCodesWithDuplications() {
-        String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
+
         List<String> requestBody = List.of("12345", "67890", "12345");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody.toString());
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
-        String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
         List<String> zipCodesList = zipCodeClient.getZipCodes();
         Set<String> zipCodesSet = new HashSet<>(zipCodesList);
 
@@ -85,15 +79,14 @@ public class ZipCodeTest {
     @Test
     @SneakyThrows
     public void testExpandZipCodesWithDuplicationsBetweenAvailableZip() {
-        String zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
+
         List<String> requestBody = List.of("12345", "67890", "12345");
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody.toString());
+        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
-        String zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
         List<String> zipCodesList = zipCodeClient.getZipCodes();
         Set<String> zipCodesSet = new HashSet<>(zipCodesList);
 
