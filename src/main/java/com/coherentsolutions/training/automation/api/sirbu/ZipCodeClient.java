@@ -32,7 +32,7 @@ public class ZipCodeClient {
         this.zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
     }
 
-    public List<String> getZipCodes() throws IOException, NoResponseException {
+    public CloseableHttpResponse getZipCodesResponse() throws IOException, NoResponseException {
         String token = authProvider.getReadToken();
         HttpGet get = new HttpGet(zipCodesUrl);
         get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -43,9 +43,17 @@ public class ZipCodeClient {
             throw new NoResponseException("No response received from the server");
         }
 
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != 200) {
-            throw new RuntimeException("Failed to get zip codes. Status code: " + statusCode);
+        return response;
+    }
+    public List<String> getZipCodes() throws IOException, NoResponseException {
+        String token = authProvider.getReadToken();
+        HttpGet get = new HttpGet(zipCodesUrl);
+        get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+
+        CloseableHttpResponse response = client.execute(get);
+
+        if (response == null) {
+            throw new NoResponseException("No response received from the server");
         }
 
         String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
