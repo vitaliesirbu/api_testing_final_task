@@ -1,5 +1,6 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
+import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,10 +36,7 @@ public class UserCreationTest {
         List<String> initialZipCodes = zipCodeClient.getZipCodes();
         String zipCodeToUse = initialZipCodes.get(0);
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("age", "30");
-        userData.put("name", "Nikola Tesla");
-        userData.put("sex", "MALE");
+        Map<String, Object> userData = UserDataGenerator.generateUniqueUserData();
         userData.put("zipCode", zipCodeToUse);
 
         CloseableHttpResponse response = userClient.createUser(userData);
@@ -47,20 +45,17 @@ public class UserCreationTest {
 
         List<Map<String, Object>> users = userClient.getUsers();
         boolean userFound = users.stream()
-                .anyMatch(user -> user.get("name").equals("Nikola Tesla"));
+                .anyMatch(user -> user.get("name").equals(userData.get("name")));
         Assert.assertTrue("User was not added to the application", userFound);
 
         List<String> updatedZipCodes = zipCodeClient.getZipCodes();
         Assert.assertFalse("Zip code was not removed from available zip codes", updatedZipCodes.contains(zipCodeToUse));
-
     }
 
     @Test
     public void testCreateUserWithRequiredFields() {
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("name", "Nostradamus");
-        userData.put("sex", "MALE");
+        Map<String, Object> userData = UserDataGenerator.generateRequiredUserData();
 
         CloseableHttpResponse response = userClient.createUser(userData);
 
@@ -68,7 +63,8 @@ public class UserCreationTest {
 
         List<Map<String, Object>> users = userClient.getUsers();
         boolean userFound = users.stream()
-                .anyMatch(user -> user.get("sex").equals("MALE"));
+                .anyMatch(user -> user.get("name").equals(userData.get("name")) &&
+                        user.get("sex").equals(userData.get("sex")));
         Assert.assertTrue("User was not added to the application", userFound);
     }
 
@@ -77,13 +73,9 @@ public class UserCreationTest {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
 
-        // Generate an unavailable zip code
         String unavailableZipCode = ZipCodeGenerator.generateUnavailableZipCode(availableZipCodes);
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("name", "Alice");
-        userData.put("sex", "FEMALE");
-        userData.put("age", 28);
+        Map<String, Object> userData = UserDataGenerator.generateUniqueUserData();
         userData.put("zipCode", unavailableZipCode);
 
         CloseableHttpResponse response = userClient.createUser(userData);
@@ -94,7 +86,7 @@ public class UserCreationTest {
 
         List<Map<String, Object>> users = userClient.getUsers();
         boolean userFound = users.stream()
-                .anyMatch(user -> user.get("name").equals("Alice"));
+                .anyMatch(user -> user.get("name").equals(userData.get("name")));
         Assert.assertFalse("User should not have been added to the application", userFound);
 
         List<String> updatedZipCodes = zipCodeClient.getZipCodes();
@@ -104,19 +96,16 @@ public class UserCreationTest {
 
     @Test
     public void testCreateUserWithExistingNameAndSex() throws Exception {
-        Map<String, Object> initialUserData = new HashMap<>();
-        initialUserData.put("name", "Platon");
-        initialUserData.put("sex", "MALE");
-        initialUserData.put("age", 30);
+        // Generate initial user data
+        Map<String, Object> initialUserData = UserDataGenerator.generateUniqueUserData();
         initialUserData.put("zipCode", zipCodeClient.getZipCodes().get(0));
 
         CloseableHttpResponse initialResponse = userClient.createUser(initialUserData);
         Assert.assertEquals(HttpStatus.SC_CREATED, initialResponse.getStatusLine().getStatusCode());
 
-        Map<String, Object> duplicateUserData = new HashMap<>();
-        duplicateUserData.put("name", "Platon");
-        duplicateUserData.put("sex", "MALE");
-        duplicateUserData.put("age", 35);  // Different age
+        // Create duplicate user data with the same name and sex, but different age and zip code
+        Map<String, Object> duplicateUserData = new HashMap<>(initialUserData);
+        duplicateUserData.put("age", (int)initialUserData.get("age") + 5);  // Different age
         duplicateUserData.put("zipCode", zipCodeClient.getZipCodes().get(1));  // Different zip code
 
         CloseableHttpResponse duplicateResponse = userClient.createUser(duplicateUserData);
@@ -127,12 +116,14 @@ public class UserCreationTest {
 
         List<Map<String, Object>> users = userClient.getUsers();
         long count = users.stream()
-                .filter(user -> user.get("name").equals("Platon") && user.get("sex").equals("MALE"))
+                .filter(user -> user.get("name").equals(initialUserData.get("name")) &&
+                        user.get("sex").equals(initialUserData.get("sex")))
                 .count();
         Assert.assertEquals("Only one user with the same name and sex should exist", 1, count);
 
         boolean duplicateUserFound = users.stream()
-                .anyMatch(user -> user.get("name").equals("Platon"));
+                .anyMatch(user -> user.get("name").equals(initialUserData.get("name")) &&
+                        user.get("age").equals(duplicateUserData.get("age")));
         Assert.assertFalse("Duplicate user should not have been added to the application", duplicateUserFound);
     }
 }
