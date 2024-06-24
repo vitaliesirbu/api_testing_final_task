@@ -2,6 +2,7 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
+import com.coherentsolutions.training.automation.api.sirbu.Utils.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHeaders;
@@ -15,7 +16,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public class UserClient {
 
@@ -32,18 +32,18 @@ public class UserClient {
     }
 
     @SneakyThrows
-    public CloseableHttpResponse createUser(Map<String, Object> userData) {
+    public CloseableHttpResponse createUser(User user) {
         String token = authProvider.getWriteToken();
         HttpPost post = new HttpPost(usersUrl);
         post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        post.setEntity(new StringEntity(objectMapper.writeValueAsString(userData), "UTF-8"));
+        post.setEntity(new StringEntity(objectMapper.writeValueAsString(user), "UTF-8"));
 
         return client.execute(post);
     }
 
     @SneakyThrows
-    public List<Map<String, Object>> getUsers() {
+    public List<User> getUsers() {
         String token = authProvider.getReadToken();
         HttpGet get = new HttpGet(usersUrl);
         get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -55,7 +55,7 @@ public class UserClient {
         }
 
         String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
-        return objectMapper.readValue(responseBody, List.class);
+        return objectMapper.readValue(responseBody, objectMapper.getTypeFactory().constructCollectionType(List.class, User.class));
     }
 
     public void close() throws IOException {

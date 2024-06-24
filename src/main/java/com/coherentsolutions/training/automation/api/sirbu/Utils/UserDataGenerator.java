@@ -1,18 +1,30 @@
 package com.coherentsolutions.training.automation.api.sirbu.Utils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class UserDataGenerator {
     private static final Random random = new Random();
 
-    public static Map<String, Object> generateUniqueUserData() {
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("name", generateUniqueName());
-        userData.put("sex", generateRandomSex());
-        userData.put("age", generateRandomAge());
-        return userData;
+    public static User generateUniqueUserData() {
+        return new User(
+                generateUniqueName(),
+                generateRandomSex(),
+                generateRandomAge(),
+                null
+        );
+    }
+
+    public static User generateUniqueUserDataWithZipCode(String zipCode) {
+        User user = generateUniqueUserData();
+        user.setZipCode(zipCode);
+        return user;
+    }
+
+    public static User generateRequiredUserData() {
+        return new User(
+                generateUniqueName(),
+                generateRandomSex()
+        );
     }
 
     private static String generateUniqueName() {
@@ -24,18 +36,6 @@ public class UserDataGenerator {
     }
 
     private static int generateRandomAge() {
-        return random.nextInt(100) + 1; // Generate age between 1 and 100
-    }
-
-    public static Map<String, Object> generateUniqueUserDataWithZipCode(String zipCode) {
-        Map<String, Object> userData = generateUniqueUserData();
-        userData.put("zipCode", zipCode);
-        return userData;
-    }
-    public static Map<String, Object> generateRequiredUserData() {
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("name", generateUniqueName());
-        userData.put("sex", generateRandomSex());
-        return userData;
+        return random.nextInt(100) + 1;
     }
 }
