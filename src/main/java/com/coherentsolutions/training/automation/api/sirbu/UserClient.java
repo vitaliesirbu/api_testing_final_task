@@ -2,6 +2,7 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
+import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHeaders;
@@ -16,59 +17,45 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.List;
 
-public class ZipCodeClient {
+public class UserClient {
 
     private final CloseableHttpClient client;
     private final ObjectMapper objectMapper;
     private final AuthProvider authProvider;
-    private final String zipCodesUrl;
-    private final String zipCodesExpandUrl;
+    private final String usersUrl;
 
-    public ZipCodeClient() {
+    public UserClient(){
         this.client = HttpClients.createDefault();
         this.objectMapper = new ObjectMapper();
         this.authProvider = AuthProvider.getInstance();
-        this.zipCodesUrl = ConfigLoader.getProperty("zip.code.url");
-        this.zipCodesExpandUrl = ConfigLoader.getProperty("zip.code.expand.url");
+        this.usersUrl = ConfigLoader.getProperty("user.url");
     }
 
-    public CloseableHttpResponse getZipCodesResponse() throws IOException, NoResponseException {
+    @SneakyThrows
+    public CloseableHttpResponse createUser(User user) {
+        String token = authProvider.getWriteToken();
+        HttpPost post = new HttpPost(usersUrl);
+        post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        post.setEntity(new StringEntity(objectMapper.writeValueAsString(user), "UTF-8"));
+
+        return client.execute(post);
+    }
+
+    @SneakyThrows
+    public List<User> getUsers() {
         String token = authProvider.getReadToken();
-        HttpGet get = new HttpGet(zipCodesUrl);
+        HttpGet get = new HttpGet(usersUrl);
         get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 
         CloseableHttpResponse response = client.execute(get);
 
-        if (response == null) {
-            throw new NoResponseException("No response received from the server");
-        }
-
-        return response;
-    }
-    public List<String> getZipCodes() throws IOException, NoResponseException {
-        String token = authProvider.getReadToken();
-        HttpGet get = new HttpGet(zipCodesUrl);
-        get.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-
-        CloseableHttpResponse response = client.execute(get);
-
-        if (response == null) {
+        if (response == null){
             throw new NoResponseException("No response received from the server");
         }
 
         String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
-        return objectMapper.readValue(responseBody, List.class);
-    }
-
-    @SneakyThrows
-    public CloseableHttpResponse postZipCodes(List<String> requestBody) {
-        String token = authProvider.getWriteToken();
-        HttpPost post = new HttpPost(zipCodesExpandUrl);
-        post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-        post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        post.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), "UTF-8"));
-
-        return client.execute(post);
+        return objectMapper.readValue(responseBody, objectMapper.getTypeFactory().constructCollectionType(List.class, User.class));
     }
 
     public void close() throws IOException {
