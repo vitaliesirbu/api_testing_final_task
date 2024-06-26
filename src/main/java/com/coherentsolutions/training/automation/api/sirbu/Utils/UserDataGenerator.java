@@ -1,5 +1,7 @@
 package com.coherentsolutions.training.automation.api.sirbu.Utils;
 
+import com.coherentsolutions.training.automation.api.sirbu.Data.User;
+
 import java.util.Random;
 
 public class UserDataGenerator {

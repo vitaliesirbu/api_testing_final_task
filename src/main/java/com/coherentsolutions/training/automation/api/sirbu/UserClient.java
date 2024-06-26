@@ -2,7 +2,7 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
-import com.coherentsolutions.training.automation.api.sirbu.Utils.User;
+import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHeaders;
@@ -28,7 +28,7 @@ public class UserClient {
         this.client = HttpClients.createDefault();
         this.objectMapper = new ObjectMapper();
         this.authProvider = AuthProvider.getInstance();
-        this.usersUrl = ConfigLoader.getProperty("userUrl");
+        this.usersUrl = ConfigLoader.getProperty("user.url");
     }
 
     @SneakyThrows

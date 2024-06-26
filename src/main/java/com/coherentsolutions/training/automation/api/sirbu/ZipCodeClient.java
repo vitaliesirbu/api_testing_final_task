@@ -28,8 +28,8 @@ public class ZipCodeClient {
         this.client = HttpClients.createDefault();
         this.objectMapper = new ObjectMapper();
         this.authProvider = AuthProvider.getInstance();
-        this.zipCodesUrl = ConfigLoader.getProperty("zipCodesUrl");
-        this.zipCodesExpandUrl = ConfigLoader.getProperty("zipCodesExpandUrl");
+        this.zipCodesUrl = ConfigLoader.getProperty("zip.code.url");
+        this.zipCodesExpandUrl = ConfigLoader.getProperty("zip.code.expand.url");
     }
 
     public CloseableHttpResponse getZipCodesResponse() throws IOException, NoResponseException {

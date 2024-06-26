@@ -47,7 +47,7 @@ public class AuthProvider {
     private String requestToken(String scope) {
         String clientId = ConfigLoader.getProperty("clientId");
         String clientSecret = ConfigLoader.getProperty("clientSecret");
-        String tokenUrl = ConfigLoader.getProperty("tokenUrl");
+        String tokenUrl = ConfigLoader.getProperty("token.url");
         String auth = clientId + ":" + clientSecret;
         String encodeAuth = Base64.getEncoder().encodeToString(auth.getBytes());
 

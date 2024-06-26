@@ -1,4 +1,4 @@
-package com.coherentsolutions.training.automation.api.sirbu.Utils;
+package com.coherentsolutions.training.automation.api.sirbu.Data;
 
 import lombok.Data;
 

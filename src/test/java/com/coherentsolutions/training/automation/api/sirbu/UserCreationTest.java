@@ -1,6 +1,6 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
-import com.coherentsolutions.training.automation.api.sirbu.Utils.User;
+import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
 import org.apache.http.HttpStatus;
