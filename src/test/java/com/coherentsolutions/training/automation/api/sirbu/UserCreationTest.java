@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 public class UserCreationTest {
@@ -51,7 +52,7 @@ public class UserCreationTest {
     }
 
     @Test
-    public void testCreateUserWithRequiredFields() {
+    public void testCreateUserWithRequiredFields() throws IOException {
 
         User user = UserDataGenerator.generateRequiredUserData();
 
