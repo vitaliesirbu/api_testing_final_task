@@ -115,4 +115,10 @@ public class UserClient {
     public void close() throws IOException {
         client.close();
     }
+
+    public void createUsers(List<User> users) throws IOException {
+        for (User user : users) {
+            createUser(user);
+        }
+    }
 }

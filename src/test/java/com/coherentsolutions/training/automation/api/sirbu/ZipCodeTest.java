@@ -19,6 +19,7 @@ public class ZipCodeTest {
         zipCodeClient = new ZipCodeClient();
     }
 
+
     @After
     @SneakyThrows
     public void tearDown() {
