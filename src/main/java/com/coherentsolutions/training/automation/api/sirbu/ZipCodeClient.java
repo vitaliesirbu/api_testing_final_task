@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 public class ZipCodeClient {
 
@@ -73,5 +74,13 @@ public class ZipCodeClient {
 
     public void close() throws IOException {
         client.close();
+    }
+    public String generateNewZipCode(String oldZipCode) {
+        Random random = new Random();
+        String newZipCode;
+        do {
+            newZipCode = String.format("%05d", random.nextInt(100000));
+        } while (newZipCode.equals(oldZipCode));
+        return newZipCode;
     }
 }

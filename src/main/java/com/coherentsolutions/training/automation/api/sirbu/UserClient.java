@@ -1,6 +1,7 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
+import com.coherentsolutions.training.automation.api.sirbu.Data.UserUpdateDTO;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,7 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -116,9 +118,27 @@ public class UserClient {
         client.close();
     }
 
-    public void createUsers(List<User> users) throws IOException {
+    public void createUsers(List<User> users) {
         for (User user : users) {
             createUser(user);
         }
+    }
+    @SneakyThrows
+    public CloseableHttpResponse updateUser(UserUpdateDTO updateDTO) {
+        String token = authProvider.getWriteToken();
+        HttpPut put = new HttpPut(usersUrl);
+        put.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        put.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        put.setEntity(new StringEntity(objectMapper.writeValueAsString(updateDTO), "UTF-8"));
+
+        return client.execute(put);
+    }
+    @SneakyThrows
+    public User getUserByName(String name) {
+        List<User> users = getUsers();
+        return users.stream()
+                .filter(u -> u.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("User not found: " + name));
     }
 }
