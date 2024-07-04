@@ -58,11 +58,7 @@ public class UserUpdateTest {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No alternative zip code available"));
 
-        User newValues = new User();
-        newValues.setName(newName);
-        newValues.setSex(newSex);
-        newValues.setAge(newAge);
-        newValues.setZipCode(newZipCode);
+        User newValues = new User(newName, newSex, newAge, newZipCode);
 
         UserUpdateDTO updateDTO = new UserUpdateDTO(initialUser, newValues);
 
@@ -122,11 +118,6 @@ public class UserUpdateTest {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No alternative zip code available"));
 
-        User completeNewValues = new User();
-        completeNewValues.setName(newName);
-        completeNewValues.setSex(newSex);
-        completeNewValues.setAge(newAge);
-        completeNewValues.setZipCode(newZipCode);
 
         User incompleteNewValues = new User();
         incompleteNewValues.setName(newName);
