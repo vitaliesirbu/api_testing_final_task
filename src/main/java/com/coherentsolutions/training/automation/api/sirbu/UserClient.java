@@ -10,10 +10,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,7 +23,9 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserClient {
 
@@ -140,5 +139,32 @@ public class UserClient {
                 .filter(u -> u.getName().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("User not found: " + name));
+    }
+
+    @SneakyThrows
+    public CloseableHttpResponse deleteUser(User user) {
+        String token = authProvider.getWriteToken();
+
+        HttpEntityEnclosingRequestBase delete = new HttpEntityEnclosingRequestBase() {
+            @Override
+            public String getMethod() {
+                return "DELETE";
+            }
+        };
+        delete.setURI(new URI(usersUrl));
+
+        delete.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        delete.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("age", user.getAge());
+        requestBody.put("name", user.getName());
+        requestBody.put("sex", user.getSex());
+        requestBody.put("zipCode", user.getZipCode());
+
+        StringEntity entity = new StringEntity(objectMapper.writeValueAsString(requestBody));
+        delete.setEntity(entity);
+
+        return client.execute(delete);
     }
 }
