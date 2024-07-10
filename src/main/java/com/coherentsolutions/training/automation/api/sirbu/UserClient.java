@@ -4,15 +4,15 @@ import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Data.UserUpdateDTO;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
+import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolVersion;
+import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHttpResponse;
@@ -20,6 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -33,12 +34,14 @@ public class UserClient {
     private final ObjectMapper objectMapper;
     private final AuthProvider authProvider;
     private final String usersUrl;
+    private final String usersUploadUrl;
 
     public UserClient(){
         this.client = HttpClients.createDefault();
         this.objectMapper = new ObjectMapper();
         this.authProvider = AuthProvider.getInstance();
         this.usersUrl = ConfigLoader.getProperty("user.url");
+        this.usersUploadUrl = ConfigLoader.getProperty("users.url");
     }
 
     @SneakyThrows
@@ -50,6 +53,49 @@ public class UserClient {
         post.setEntity(new StringEntity(objectMapper.writeValueAsString(user), "UTF-8"));
 
         return client.execute(post);
+    }
+
+    @SneakyThrows
+    public CloseableHttpResponse uploadUsers(File jsonFile) {
+        String token = authProvider.getWriteToken();
+        HttpPost post = new HttpPost(usersUploadUrl);
+        post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addBinaryBody(
+                "file",
+                jsonFile,
+                ContentType.APPLICATION_JSON,
+                jsonFile.getName()
+        );
+
+        HttpEntity multipart = builder.build();
+        post.setEntity(multipart);
+
+        return client.execute(post);
+    }
+
+    public List<User> generateValidUsers(int count, List<String> availableZipCodes) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < count && i < availableZipCodes.size(); i++) {
+            users.add(UserDataGenerator.generateUniqueUserDataWithZipCode(availableZipCodes.get(i)));
+        }
+        return users;
+    }
+    public User generateUserWithIncorrectZipCode() {
+
+        User user = UserDataGenerator.generateUniqueUserData();
+
+        user.setZipCode("99999");
+
+        return user;
+    }
+
+    public User generateUserWIthoutRequiredField(){
+
+        User user = UserDataGenerator.generateUniqueUserDataWithOutRequiredFields();
+
+        return user;
     }
 
     @SneakyThrows

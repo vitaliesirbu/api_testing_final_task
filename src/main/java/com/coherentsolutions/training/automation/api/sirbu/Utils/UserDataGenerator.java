@@ -16,6 +16,12 @@ public class UserDataGenerator {
         );
     }
 
+    public static User generateUniqueUserDataWithOutRequiredFields(){
+        return new User(
+                generateUniqueName(),
+                generateRandomAge()
+        );
+    }
     public static User generateUniqueUserDataWithZipCode(String zipCode) {
         User user = generateUniqueUserData();
         user.setZipCode(zipCode);
