@@ -2,6 +2,8 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
@@ -38,6 +40,8 @@ public class UserRetrievalTest {
     }
 
     @Test
+    @Issue("User Retrieval")
+    @Step("Get all available users")
     public void testGetAllUsers() {
         CloseableHttpResponse response = userClient.getUsers(null, null, null);
 
@@ -49,6 +53,8 @@ public class UserRetrievalTest {
     }
 
     @Test
+    @Issue("User Retrieval")
+    @Step("Get all users older than a certain age")
     public void testGetUsersOlderThan() {
         int olderThan = 30;
         CloseableHttpResponse response = userClient.getUsers(olderThan, null, null);
@@ -63,6 +69,8 @@ public class UserRetrievalTest {
     }
 
     @Test
+    @Issue("User Retrieval")
+    @Step("Get all users younger than a certain age")
     public void testGetUsersYoungerThan() {
 
         int youngerThan = 25;
@@ -78,6 +86,8 @@ public class UserRetrievalTest {
     }
 
     @Test
+    @Issue("User Retrieval")
+    @Step("Get all users filtered by sex parameter")
     public void testGetUsersBySex() {
         String sex = "FEMALE";
         CloseableHttpResponse response = userClient.getUsers(null, sex, null);

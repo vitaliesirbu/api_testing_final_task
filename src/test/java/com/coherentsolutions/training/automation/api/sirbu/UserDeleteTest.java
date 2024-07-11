@@ -2,6 +2,8 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -40,6 +42,8 @@ public class UserDeleteTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Deletion")
+    @Step("Delete a user using all available fields")
     public void testDeleteUserSuccessfully() {
 
         CloseableHttpResponse response = userClient.deleteUser(testUser);
@@ -55,6 +59,8 @@ public class UserDeleteTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Deletion")
+    @Step("Delete a user using only required fields")
     public void testDeleteUserWithRequiredFieldsOnly() {
 
         User userToDelete = new User(testUser.getName(), testUser.getSex(), 0, "");
@@ -71,6 +77,8 @@ public class UserDeleteTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Deletion")
+    @Step("Delete user without a required field")
     public void testDeleteUserWithMissingRequiredField() {
 
         User incompleteUser = new User(testUser.getName(), null, 0, "");

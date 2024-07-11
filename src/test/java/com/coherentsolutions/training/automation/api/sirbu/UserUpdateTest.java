@@ -4,6 +4,8 @@ import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Data.UserUpdateDTO;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -48,6 +50,8 @@ public class UserUpdateTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Update")
+    @Step("Update all fields for a particular user")
     public void testUpdateUserSuccessfully() {
         String newName = initialUser.getName() + "_updated";
         String newSex = initialUser.getSex().equals("MALE") ? "FEMALE" : "MALE";
@@ -76,6 +80,8 @@ public class UserUpdateTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Update")
+    @Step("Update an user by assigning an invalid zip code")
     public void testUpdateUserWithUnavailableZipCode() {
 
         String unavailableZipCode = ZipCodeGenerator.generateUnavailableZipCode(availableZipCodes);
@@ -108,6 +114,8 @@ public class UserUpdateTest {
     }
 
     @Test
+    @Issue("User Update")
+    @Step("Update an user without an required field")
     public void testUpdateUserOmittingRequiredField() {
 
         String newName = initialUser.getName();

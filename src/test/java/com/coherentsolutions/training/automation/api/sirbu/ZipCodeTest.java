@@ -1,5 +1,7 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
@@ -28,6 +30,8 @@ public class ZipCodeTest {
 
     @Test
     @SneakyThrows
+    @Issue("Zip Code")
+    @Step("Get all available zip codes")
     public void testGetZipCodes() {
         CloseableHttpResponse response = zipCodeClient.getZipCodesResponse();
         int statusCode = response.getStatusLine().getStatusCode();
@@ -42,6 +46,8 @@ public class ZipCodeTest {
 
     @Test
     @SneakyThrows
+    @Issue("Zip Code")
+    @Step("Add new zip codes")
     public void testPostZipCodes() {
 
         List<String> requestBody = List.of("12345", "67890");
@@ -60,6 +66,8 @@ public class ZipCodeTest {
 
     @Test
     @SneakyThrows
+    @Issue("Zip Code")
+    @Step("Add duplicated zip codes")
     public void testExpandZipCodesWithDuplications() {
 
         List<String> requestBody = List.of("12345", "67890", "12345");
@@ -78,6 +86,8 @@ public class ZipCodeTest {
 
     @Test
     @SneakyThrows
+    @Issue("Zip Code")
+    @Step("Check that no duplications between available zip codes and already used zip codes are added")
     public void testExpandZipCodesWithDuplicationsBetweenAvailableZip() {
 
         List<String> requestBody = List.of("12345", "67890", "12345");

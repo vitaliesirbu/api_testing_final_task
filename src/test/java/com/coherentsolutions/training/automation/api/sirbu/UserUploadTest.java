@@ -3,6 +3,8 @@ package com.coherentsolutions.training.automation.api.sirbu;
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.JsonFileUtil;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -34,6 +36,8 @@ public class UserUploadTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Upload")
+    @Step("Upload a list of valid users")
     public void testSuccessfulUserUpload() {
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
         List<User> usersToUpload = userClient.generateValidUsers(3, availableZipCodes);
@@ -60,6 +64,8 @@ public class UserUploadTest {
     }
     @Test
     @SneakyThrows
+    @Issue("User Upload")
+    @Step("Upload a list of users where at least a single user has an invalid zip code")
     public void testFailedUserUploadWithIncorrectZipCode() {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
@@ -87,6 +93,8 @@ public class UserUploadTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Upload")
+    @Step("Upload a list of users where at least a single user doesn't have a required field")
     public void testFailedUserUploadWithMissingRequiredField() {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();

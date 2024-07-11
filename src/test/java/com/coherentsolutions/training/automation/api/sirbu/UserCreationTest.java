@@ -3,6 +3,10 @@ package com.coherentsolutions.training.automation.api.sirbu;
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
+import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
@@ -10,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 public class UserCreationTest {
@@ -31,7 +34,10 @@ public class UserCreationTest {
     }
 
     @Test
-    public void testCreateUserWithAllFields() throws Exception{
+    @SneakyThrows
+    @Issue("User Creation")
+    @Step("Create a user with all fields")
+    public void testCreateUserWithAllFields() {
 
         List<String> initialZipCodes = zipCodeClient.getZipCodes();
         String zipCodeToUse = initialZipCodes.get(0);
@@ -39,6 +45,8 @@ public class UserCreationTest {
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeToUse);
 
         CloseableHttpResponse response = userClient.createUser(user);
+
+        addPayloadToReport("User creation payload", user);
 
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
 
@@ -49,14 +57,20 @@ public class UserCreationTest {
 
         List<String> updatedZipCodes = zipCodeClient.getZipCodes();
         Assert.assertFalse("Zip code was not removed from available zip codes", updatedZipCodes.contains(zipCodeToUse));
+
     }
 
     @Test
-    public void testCreateUserWithRequiredFields() throws IOException {
+    @SneakyThrows
+    @Issue("User Creation")
+    @Step("Create a user with all required fields")
+    public void testCreateUserWithRequiredFields() {
 
         User user = UserDataGenerator.generateRequiredUserData();
 
         CloseableHttpResponse response = userClient.createUser(user);
+
+        addPayloadToReport("User creation payload", user);
 
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
 
@@ -68,7 +82,10 @@ public class UserCreationTest {
     }
 
     @Test
-    public void testCreateUserWithIncorrectZipCode() throws Exception {
+    @SneakyThrows
+    @Issue("User Creation")
+    @Step("Create a user with incorrect Zip Code")
+    public void testCreateUserWithIncorrectZipCode() {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
 
@@ -77,6 +94,8 @@ public class UserCreationTest {
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(unavailableZipCode);
 
         CloseableHttpResponse response = userClient.createUser(user);
+
+        addPayloadToReport("User creation payload", user);
 
         Assert.assertEquals("Expected 424 Failed Dependency for incorrect zip code",
                 HttpStatus.SC_FAILED_DEPENDENCY,
@@ -93,7 +112,10 @@ public class UserCreationTest {
     }
 
     @Test
-    public void testCreateUserWithExistingNameAndSex() throws Exception {
+    @SneakyThrows
+    @Issue("User Creation")
+    @Step("Create a dublicate user")
+    public void testCreateUserWithExistingNameAndSex() {
         User initialUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeClient.getZipCodes().get(0));
 
         CloseableHttpResponse initialResponse = userClient.createUser(initialUser);
@@ -103,6 +125,8 @@ public class UserCreationTest {
                 initialUser.getAge() + 5, zipCodeClient.getZipCodes().get(1));
 
         CloseableHttpResponse duplicateResponse = userClient.createUser(duplicateUser);
+
+        addPayloadToReport("User creation payload", duplicateUser);
 
         Assert.assertEquals("Expected 400 Bad Request for duplicate name and sex",
                 HttpStatus.SC_BAD_REQUEST,
@@ -120,4 +144,10 @@ public class UserCreationTest {
                         u.getAge() == duplicateUser.getAge());
         Assert.assertFalse("Duplicate user should not have been added to the application", duplicateUserFound);
         }
+
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private void addPayloadToReport(String attachmentName, Object payload) {
+        payload.toString();
     }
+
+}
