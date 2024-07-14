@@ -1,6 +1,8 @@
 target/
 .idea/
 .allure
+.allure-report/
+.allure-result/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
