@@ -4,6 +4,7 @@ import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Data.UserUpdateDTO;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
+import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
 import lombok.SneakyThrows;
@@ -40,6 +41,8 @@ public class UserUpdateTest {
         initialUser = UserDataGenerator.generateUniqueUserDataWithZipCode(availableZipCodes.get(0));
         CloseableHttpResponse response = userClient.createUser(initialUser);
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+
+        addPayloadToReport("Initial User", initialUser);
     }
 
     @After
@@ -66,11 +69,15 @@ public class UserUpdateTest {
 
         UserUpdateDTO updateDTO = new UserUpdateDTO(initialUser, newValues);
 
+        addPayloadToReport("Update DTO", updateDTO);
+
         CloseableHttpResponse response = userClient.updateUser(updateDTO);
 
         Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
 
         User retrievedUser = userClient.getUserByName(newName);
+
+        addPayloadToReport("Retrieved Updated User", retrievedUser);
 
         Assert.assertEquals(newName, retrievedUser.getName());
         Assert.assertEquals(newSex, retrievedUser.getSex());
@@ -98,11 +105,16 @@ public class UserUpdateTest {
 
         UserUpdateDTO updateDTO = new UserUpdateDTO(initialUser, newValues);
 
+        addPayloadToReport("Update DTO with Unavailable Zip Code", updateDTO);
+
         CloseableHttpResponse response = userClient.updateUser(updateDTO);
 
         Assert.assertEquals(HttpStatus.SC_FAILED_DEPENDENCY, response.getStatusLine().getStatusCode());
 
         User retrievedUser = userClient.getUserByName(initialUser.getName());
+
+        addPayloadToReport("Retrieved User After Failed Update", retrievedUser);
+
         Assert.assertEquals(initialUser.getName(), retrievedUser.getName());
         Assert.assertEquals(initialUser.getSex(), retrievedUser.getSex());
         Assert.assertEquals(initialUser.getAge(), retrievedUser.getAge());
@@ -110,6 +122,9 @@ public class UserUpdateTest {
 
 
         List<String> updatedZipCodes = zipCodeClient.getZipCodes();
+
+        addPayloadToReport("Updated Zip Codes", updatedZipCodes);
+
         Assert.assertFalse(updatedZipCodes.contains(unavailableZipCode));
     }
 
@@ -134,14 +149,24 @@ public class UserUpdateTest {
 
         UserUpdateDTO updateDTO = new UserUpdateDTO(initialUser, incompleteNewValues);
 
+        addPayloadToReport("Update DTO with Missing Required Field", updateDTO);
+
         CloseableHttpResponse response = userClient.updateUser(updateDTO);
 
         Assert.assertEquals(HttpStatus.SC_CONFLICT, response.getStatusLine().getStatusCode());
 
         User retrievedUser = userClient.getUserByName(initialUser.getName());
+
+        addPayloadToReport("Retrieved User After Failed Update", retrievedUser);
+
         Assert.assertEquals(initialUser.getName(), retrievedUser.getName());
         Assert.assertEquals(initialUser.getSex(), retrievedUser.getSex());
         Assert.assertEquals(initialUser.getAge(), retrievedUser.getAge());
         Assert.assertEquals(initialUser.getZipCode(), retrievedUser.getZipCode());
     }
+
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
+}
 }

@@ -1,9 +1,11 @@
 package com.coherentsolutions.training.automation.api.sirbu;
 
+import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,8 +39,12 @@ public class ZipCodeTest {
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(200, statusCode);
 
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
+
         List<String> zipCodesList = zipCodeClient.getZipCodes();
-        System.out.println("Current zip codes are: " + zipCodesList);
+
+        addPayloadToReport("Zip Codes List", zipCodesList);;
 
         Assert.assertTrue(!zipCodesList.isEmpty());
 
@@ -52,12 +58,19 @@ public class ZipCodeTest {
 
         List<String> requestBody = List.of("12345", "67890");
 
+        addPayloadToReport("Request Body", requestBody);
+
         CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
+
         List<String> zipCodesList = zipCodeClient.getZipCodes();
+
+        addPayloadToReport("Updated Zip Codes List", zipCodesList);
 
         Assert.assertTrue(zipCodesList.contains("12345"));
         Assert.assertTrue(zipCodesList.contains("67890"));
@@ -72,12 +85,19 @@ public class ZipCodeTest {
 
         List<String> requestBody = List.of("12345", "67890", "12345");
 
+        addPayloadToReport("Request Body", requestBody);
+
         CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
+
         List<String> zipCodesList = zipCodeClient.getZipCodes();
+
+        addPayloadToReport("Updated Zip Codes List", zipCodesList);
 
         Assert.assertTrue(zipCodesList.contains("12345"));
         Assert.assertTrue(zipCodesList.contains("67890"));
@@ -92,15 +112,27 @@ public class ZipCodeTest {
 
         List<String> requestBody = List.of("12345", "67890", "12345");
 
+        addPayloadToReport("Request Body", requestBody);
+
         CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
+
         List<String> zipCodesList = zipCodeClient.getZipCodes();
+
+        addPayloadToReport("Updated Zip Codes List", zipCodesList);
 
         Assert.assertTrue(zipCodesList.contains("12345"));
         Assert.assertTrue(zipCodesList.contains("67890"));
         Assert.assertEquals(NUMBER_OF_ZIP_CODES.intValue(), zipCodesList.size());
+    }
+
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
     }
 }

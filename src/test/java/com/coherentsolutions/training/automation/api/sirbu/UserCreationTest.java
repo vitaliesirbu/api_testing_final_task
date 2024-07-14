@@ -43,10 +43,9 @@ public class UserCreationTest {
         String zipCodeToUse = initialZipCodes.get(0);
 
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeToUse);
+        addPayloadToReport("User creation payload", user);
 
         CloseableHttpResponse response = userClient.createUser(user);
-
-        addPayloadToReport("User creation payload", user);
 
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
 
@@ -58,6 +57,8 @@ public class UserCreationTest {
         List<String> updatedZipCodes = zipCodeClient.getZipCodes();
         Assert.assertFalse("Zip code was not removed from available zip codes", updatedZipCodes.contains(zipCodeToUse));
 
+        addPayloadToReport("Updated users list", users);
+        addPayloadToReport("Updated zip codes", updatedZipCodes);
     }
 
     @Test
@@ -68,9 +69,9 @@ public class UserCreationTest {
 
         User user = UserDataGenerator.generateRequiredUserData();
 
-        CloseableHttpResponse response = userClient.createUser(user);
-
         addPayloadToReport("User creation payload", user);
+
+        CloseableHttpResponse response = userClient.createUser(user);
 
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
 
@@ -79,6 +80,8 @@ public class UserCreationTest {
                 .anyMatch(u -> u.getName().equals(user.getName()) &&
                         u.getSex().equals(user.getSex()));
         Assert.assertTrue("User was not added to the application", userFound);
+
+        addPayloadToReport("Updated users list", users);
     }
 
     @Test
@@ -93,9 +96,9 @@ public class UserCreationTest {
 
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(unavailableZipCode);
 
-        CloseableHttpResponse response = userClient.createUser(user);
-
         addPayloadToReport("User creation payload", user);
+
+        CloseableHttpResponse response = userClient.createUser(user);
 
         Assert.assertEquals("Expected 424 Failed Dependency for incorrect zip code",
                 HttpStatus.SC_FAILED_DEPENDENCY,
@@ -109,6 +112,9 @@ public class UserCreationTest {
         List<String> updatedZipCodes = zipCodeClient.getZipCodes();
         Assert.assertEquals("Available zip codes should remain unchanged",
                 availableZipCodes, updatedZipCodes);
+
+        addPayloadToReport("Updated users list", users);
+        addPayloadToReport("Updated zip codes", updatedZipCodes);
     }
 
     @Test
@@ -118,15 +124,17 @@ public class UserCreationTest {
     public void testCreateUserWithExistingNameAndSex() {
         User initialUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeClient.getZipCodes().get(0));
 
+        addPayloadToReport("Initial user creation payload", initialUser);
+
         CloseableHttpResponse initialResponse = userClient.createUser(initialUser);
         Assert.assertEquals(HttpStatus.SC_CREATED, initialResponse.getStatusLine().getStatusCode());
 
         User duplicateUser = new User(initialUser.getName(), initialUser.getSex(),
                 initialUser.getAge() + 5, zipCodeClient.getZipCodes().get(1));
 
-        CloseableHttpResponse duplicateResponse = userClient.createUser(duplicateUser);
+        addPayloadToReport("Duplicate user creation payload", duplicateUser);
 
-        addPayloadToReport("User creation payload", duplicateUser);
+        CloseableHttpResponse duplicateResponse = userClient.createUser(duplicateUser);
 
         Assert.assertEquals("Expected 400 Bad Request for duplicate name and sex",
                 HttpStatus.SC_BAD_REQUEST,
@@ -143,6 +151,9 @@ public class UserCreationTest {
                 .anyMatch(u -> u.getName().equals(initialUser.getName()) &&
                         u.getAge() == duplicateUser.getAge());
         Assert.assertFalse("Duplicate user should not have been added to the application", duplicateUserFound);
+
+        addPayloadToReport("Updated users list", users);
+
         }
 
     @Attachment(value = "{attachmentName}", type = "application/json")

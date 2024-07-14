@@ -2,6 +2,7 @@ package com.coherentsolutions.training.automation.api.sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
+import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
 import lombok.SneakyThrows;
@@ -31,6 +32,7 @@ public class UserDeleteTest {
 
         testUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCode);
         CloseableHttpResponse response = userClient.createUser(testUser);
+
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
     }
 
@@ -55,6 +57,9 @@ public class UserDeleteTest {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
         Assert.assertTrue(availableZipCodes.contains(testUser.getZipCode()));
+
+        addPayloadToReport("Remaining Users", users);
+        addPayloadToReport("Available Zip Codes", availableZipCodes);
     }
 
     @Test
@@ -73,6 +78,8 @@ public class UserDeleteTest {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
         Assert.assertTrue(availableZipCodes.contains(testUser.getZipCode()));
+
+        addPayloadToReport("Remaining Users", users);
     }
 
     @Test
@@ -89,5 +96,12 @@ public class UserDeleteTest {
 
         List<User> users = userClient.getUsers();
         Assert.assertTrue(users.stream().anyMatch(u -> u.getName().equals(testUser.getName())));
+
+        addPayloadToReport("Remaining Users", users);
     }
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
+    }
+
 }
