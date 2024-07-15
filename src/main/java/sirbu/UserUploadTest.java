@@ -1,8 +1,12 @@
-package com.coherentsolutions.training.automation.api.sirbu;
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
+import com.coherentsolutions.training.automation.api.sirbu.UserClient;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.JsonFileUtil;
-
+import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -34,12 +38,17 @@ public class UserUploadTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Upload")
+    @Step("Upload a list of valid users")
     public void testSuccessfulUserUpload() {
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
         List<User> usersToUpload = userClient.generateValidUsers(3, availableZipCodes);
         File jsonFile = JsonFileUtil.createJsonFile(usersToUpload, "users");
 
+
         CloseableHttpResponse response = userClient.uploadUsers(jsonFile);
+
+        addPayloadToReport("Response", EntityUtils.toString(response.getEntity()));
 
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
 
@@ -60,6 +69,8 @@ public class UserUploadTest {
     }
     @Test
     @SneakyThrows
+    @Issue("User Upload")
+    @Step("Upload a list of users where at least a single user has an invalid zip code")
     public void testFailedUserUploadWithIncorrectZipCode() {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
@@ -71,7 +82,10 @@ public class UserUploadTest {
 
         File jsonFile = JsonFileUtil.createJsonFile(usersToUpload, "users_with_incorrect_zip");
 
+
         CloseableHttpResponse response = userClient.uploadUsers(jsonFile);
+
+        addPayloadToReport("Response", EntityUtils.toString(response.getEntity()));
 
         Assert.assertEquals(HttpStatus.SC_FAILED_DEPENDENCY, response.getStatusLine().getStatusCode());
 
@@ -87,6 +101,8 @@ public class UserUploadTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Upload")
+    @Step("Upload a list of users where at least a single user doesn't have a required field")
     public void testFailedUserUploadWithMissingRequiredField() {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
@@ -111,5 +127,10 @@ public class UserUploadTest {
         }
 
         jsonFile.delete();
+    }
+
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
     }
 }

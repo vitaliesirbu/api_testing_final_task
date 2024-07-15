@@ -6,6 +6,7 @@ import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Attachment;
 import lombok.SneakyThrows;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
@@ -51,6 +52,8 @@ public class UserClient {
         post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         post.setEntity(new StringEntity(objectMapper.writeValueAsString(user), "UTF-8"));
+
+        addPayloadToReport("User creation payload", user);
 
         return client.execute(post);
     }
@@ -212,5 +215,10 @@ public class UserClient {
         delete.setEntity(entity);
 
         return client.execute(delete);
+    }
+
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
     }
 }

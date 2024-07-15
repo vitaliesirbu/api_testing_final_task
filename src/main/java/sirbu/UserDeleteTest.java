@@ -1,7 +1,12 @@
-package com.coherentsolutions.training.automation.api.sirbu;
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
+import com.coherentsolutions.training.automation.api.sirbu.UserClient;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
+import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -29,6 +34,7 @@ public class UserDeleteTest {
 
         testUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCode);
         CloseableHttpResponse response = userClient.createUser(testUser);
+
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
     }
 
@@ -40,6 +46,8 @@ public class UserDeleteTest {
 
     @Test
     @SneakyThrows
+    @Issue("User Deletion")
+    @Step("Delete a user using all available fields")
     public void testDeleteUserSuccessfully() {
 
         CloseableHttpResponse response = userClient.deleteUser(testUser);
@@ -51,10 +59,15 @@ public class UserDeleteTest {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
         Assert.assertTrue(availableZipCodes.contains(testUser.getZipCode()));
+
+        addPayloadToReport("Remaining Users", users);
+        addPayloadToReport("Available Zip Codes", availableZipCodes);
     }
 
     @Test
     @SneakyThrows
+    @Issue("User Deletion")
+    @Step("Delete a user using only required fields")
     public void testDeleteUserWithRequiredFieldsOnly() {
 
         User userToDelete = new User(testUser.getName(), testUser.getSex(), 0, "");
@@ -67,10 +80,14 @@ public class UserDeleteTest {
 
         List<String> availableZipCodes = zipCodeClient.getZipCodes();
         Assert.assertTrue(availableZipCodes.contains(testUser.getZipCode()));
+
+        addPayloadToReport("Remaining Users", users);
     }
 
     @Test
     @SneakyThrows
+    @Issue("User Deletion")
+    @Step("Delete user without a required field")
     public void testDeleteUserWithMissingRequiredField() {
 
         User incompleteUser = new User(testUser.getName(), null, 0, "");
@@ -81,5 +98,12 @@ public class UserDeleteTest {
 
         List<User> users = userClient.getUsers();
         Assert.assertTrue(users.stream().anyMatch(u -> u.getName().equals(testUser.getName())));
+
+        addPayloadToReport("Remaining Users", users);
     }
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
+    }
+
 }
