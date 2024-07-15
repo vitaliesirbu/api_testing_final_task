@@ -3,6 +3,7 @@ package com.coherentsolutions.training.automation.api.sirbu;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ConfigLoader;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.NoResponseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Attachment;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -44,6 +45,9 @@ public class ZipCodeClient {
             throw new NoResponseException("No response received from the server");
         }
 
+        String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
+        addPayloadToReport("Response", responseBody);
+
         return response;
     }
     public List<String> getZipCodes() throws IOException, NoResponseException {
@@ -69,7 +73,11 @@ public class ZipCodeClient {
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         post.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), "UTF-8"));
 
-        return client.execute(post);
+        CloseableHttpResponse response = client.execute(post);
+        String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
+        addPayloadToReport("Response", responseBody);
+
+        return response;
     }
 
     public void close() throws IOException {
@@ -82,5 +90,10 @@ public class ZipCodeClient {
             newZipCode = String.format("%05d", random.nextInt(100000));
         } while (newZipCode.equals(oldZipCode));
         return newZipCode;
+    }
+
+    @Attachment(value = "{attachmentName}", type = "application/json")
+    private String addPayloadToReport(String attachmentName, Object payload) {
+        return payload.toString();
     }
 }

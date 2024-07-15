@@ -1,8 +1,10 @@
-package com.coherentsolutions.training.automation.api.sirbu;
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
+import com.coherentsolutions.training.automation.api.sirbu.UserClient;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
+import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
@@ -19,7 +21,7 @@ import java.util.List;
 public class UserCreationTest {
 
     private ZipCodeClient zipCodeClient;
-    private  UserClient userClient;
+    private UserClient userClient;
 
     @Before
     public void setUp(){
@@ -43,7 +45,6 @@ public class UserCreationTest {
         String zipCodeToUse = initialZipCodes.get(0);
 
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeToUse);
-        addPayloadToReport("User creation payload", user);
 
         CloseableHttpResponse response = userClient.createUser(user);
 
@@ -68,8 +69,6 @@ public class UserCreationTest {
     public void testCreateUserWithRequiredFields() {
 
         User user = UserDataGenerator.generateRequiredUserData();
-
-        addPayloadToReport("User creation payload", user);
 
         CloseableHttpResponse response = userClient.createUser(user);
 
@@ -96,7 +95,6 @@ public class UserCreationTest {
 
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(unavailableZipCode);
 
-        addPayloadToReport("User creation payload", user);
 
         CloseableHttpResponse response = userClient.createUser(user);
 

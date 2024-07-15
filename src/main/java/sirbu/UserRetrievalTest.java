@@ -1,6 +1,7 @@
-package com.coherentsolutions.training.automation.api.sirbu;
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
+import com.coherentsolutions.training.automation.api.sirbu.UserClient;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerator;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
