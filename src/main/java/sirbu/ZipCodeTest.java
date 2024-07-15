@@ -40,6 +40,9 @@ public class ZipCodeTest {
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(200, statusCode);
 
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
+
         List<String> zipCodesList = zipCodeClient.getZipCodes();
 
         addPayloadToReport("Zip Codes List", zipCodesList);;
@@ -56,10 +59,15 @@ public class ZipCodeTest {
 
         List<String> requestBody = List.of("12345", "67890");
 
+        addPayloadToReport("Request Body", requestBody);
+
         CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
+
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
 
         List<String> zipCodesList = zipCodeClient.getZipCodes();
 
@@ -78,10 +86,15 @@ public class ZipCodeTest {
 
         List<String> requestBody = List.of("12345", "67890", "12345");
 
+        addPayloadToReport("Request Body", requestBody);
+
         CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
+
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
 
         List<String> zipCodesList = zipCodeClient.getZipCodes();
 
@@ -100,11 +113,15 @@ public class ZipCodeTest {
 
         List<String> requestBody = List.of("12345", "67890", "12345");
 
+        addPayloadToReport("Request Body", requestBody);
+
         CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
 
         int statusCode = response.getStatusLine().getStatusCode();
         Assert.assertEquals(201, statusCode);
 
+        String responseBody = EntityUtils.toString(response.getEntity());
+        addPayloadToReport("Response", responseBody);
 
         List<String> zipCodesList = zipCodeClient.getZipCodes();
 
