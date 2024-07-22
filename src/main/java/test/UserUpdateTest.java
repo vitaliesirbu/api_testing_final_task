@@ -1,4 +1,4 @@
-package sirbu;
+package test;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Data.UserUpdateDTO;

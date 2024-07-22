@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vs</groupId>
-    <artifactId>api_training</artifactId>
+    <artifactId>api_testing_final_task</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -114,7 +114,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
-                    <testSourceDirectory>src/main/java</testSourceDirectory>
+                    <testSourceDirectory>src/main/java/sirbu</testSourceDirectory>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
                     <properties>
                         <property>
                             <name>listener</name>
@@ -132,5 +135,8 @@
                 </configuration>
             </plugin>
         </plugins>
+        <testSourceDirectory>
+            src/main/java
+        </testSourceDirectory>
     </build>
 </project>
