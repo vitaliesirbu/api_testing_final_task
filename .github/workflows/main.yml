@@ -13,9 +13,7 @@ on:
         default: 'Manual Run'
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
     
 jobs:
   test:
