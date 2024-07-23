@@ -170,5 +170,5 @@ public class UserUpdateTest {
     @Attachment(value = "{attachmentName}", type = "application/json")
     private String addPayloadToReport(String attachmentName, Object payload) {
         return payload.toString();
-}
+    }
 }
