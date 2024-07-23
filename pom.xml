@@ -114,10 +114,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
-                    <testSourceDirectory>src/main/java/sirbu</testSourceDirectory>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
+                    <testSourceDirectory>src/main/java</testSourceDirectory>
                     <properties>
                         <property>
                             <name>listener</name>
@@ -131,7 +128,7 @@
                 <artifactId>allure-maven</artifactId>
                 <version>2.12.0</version>
                 <configuration>
-                    <resultsDirectory>target/allure-results</resultsDirectory>
+                    <reportVersion>2.12.0</reportVersion>
                 </configuration>
             </plugin>
         </plugins>

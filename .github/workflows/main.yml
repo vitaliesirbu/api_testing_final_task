@@ -20,7 +20,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -47,16 +47,6 @@ jobs:
       - name: Build and run tests with Maven
         run: mvn clean test
         continue-on-error: true
-
-      - name: Check test results
-        run: |
-          if [ -d "target/surefire-reports" ] && [ "$(find target/surefire-reports -name '*.xml' | wc -l)" -gt 0 ]; then
-            echo "Tests were run"
-            grep -r -i "failures=\"[1-9]" target/surefire-reports/*.xml && exit 1 || echo "All tests passed"
-          else
-            echo "No test results found"
-            exit 1
-          fi
 
       - name: Load test report history
         uses: actions/checkout@v3

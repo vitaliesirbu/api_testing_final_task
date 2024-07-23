@@ -1,3 +1,4 @@
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.UserClient;
@@ -29,9 +30,6 @@ public class UserDeleteTest {
         userClient = new UserClient();
 
         initialZipCodes = zipCodeClient.getZipCodes();
-        if (initialZipCodes.isEmpty()) {
-            throw new Exception("No zip codes available for testing.");
-        }
         String zipCode = initialZipCodes.get(0);
 
         testUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCode);

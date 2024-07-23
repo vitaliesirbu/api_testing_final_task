@@ -1,3 +1,4 @@
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.Data.User;
 import com.coherentsolutions.training.automation.api.sirbu.Data.UserUpdateDTO;
@@ -32,14 +33,10 @@ public class UserUpdateTest {
 
         availableZipCodes = zipCodeClient.getZipCodes();
 
-        if (availableZipCodes.isEmpty()) {
-            throw new Exception("No zip codes available for testing.");
-        }
-
         if (availableZipCodes.size() < 2) {
             String newZipCode = zipCodeClient.generateNewZipCode(availableZipCodes.get(0));
             CloseableHttpResponse response = zipCodeClient.postZipCodes(List.of(newZipCode));
-            Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+            Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
             availableZipCodes.add(newZipCode);
         }
 

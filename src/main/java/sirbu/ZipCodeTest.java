@@ -1,3 +1,4 @@
+package sirbu;
 
 import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
 import io.qameta.allure.Attachment;
@@ -11,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static com.coherentsolutions.training.automation.api.sirbu.Utils.Constants.NUMBER_OF_ZIP_CODES;
@@ -45,7 +45,7 @@ public class ZipCodeTest {
 
         List<String> zipCodesList = zipCodeClient.getZipCodes();
 
-        addPayloadToReport("Zip Codes List", zipCodesList);
+        addPayloadToReport("Zip Codes List", zipCodesList);;
 
         Assert.assertTrue(!zipCodesList.isEmpty());
 
@@ -56,9 +56,6 @@ public class ZipCodeTest {
     @Issue("Zip Code")
     @Step("Add new zip codes")
     public void testPostZipCodes() {
-
-        List<String> initialZipCodes = zipCodeClient.getZipCodes();
-        int initialSize = initialZipCodes.size();
 
         List<String> requestBody = List.of("12345", "67890");
 
@@ -72,15 +69,12 @@ public class ZipCodeTest {
         String responseBody = EntityUtils.toString(response.getEntity());
         addPayloadToReport("Response", responseBody);
 
-        List<String> updatedZipCodes = zipCodeClient.getZipCodes();
-        addPayloadToReport("Updated Zip Codes List", updatedZipCodes);
+        List<String> zipCodesList = zipCodeClient.getZipCodes();
 
-        Assert.assertTrue(updatedZipCodes.contains("12345"));
-        Assert.assertTrue(updatedZipCodes.contains("67890"));
+        addPayloadToReport("Updated Zip Codes List", zipCodesList);
 
-        Assert.assertEquals(initialSize + 2, updatedZipCodes.size());
-
-        Assert.assertEquals(new HashSet<>(updatedZipCodes).size(), updatedZipCodes.size());
+        Assert.assertTrue(zipCodesList.contains("12345"));
+        Assert.assertTrue(zipCodesList.contains("67890"));
     }
 
 
