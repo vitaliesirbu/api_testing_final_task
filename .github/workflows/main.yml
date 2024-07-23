@@ -88,3 +88,7 @@ jobs:
             test-results/**/*.xml
             test-results/**/*.trx
             test-results/**/*.json    
+            
+            permissions:
+              checks: write
+              pull-requests: write     
