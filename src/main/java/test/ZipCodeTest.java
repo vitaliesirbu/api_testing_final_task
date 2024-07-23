@@ -1,4 +1,3 @@
-package test;
 
 import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
 import io.qameta.allure.Attachment;
