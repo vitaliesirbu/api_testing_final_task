@@ -16,6 +16,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class UserCreationTest {
@@ -24,9 +26,15 @@ public class UserCreationTest {
     private UserClient userClient;
 
     @Before
-    public void setUp(){
+    public void setUp() throws IOException {
         zipCodeClient = new ZipCodeClient();
         userClient = new UserClient();
+
+        List<String> availableZipCodes = zipCodeClient.getZipCodes();
+        if (availableZipCodes.size() < 2) {
+            List<String> newZipCodes = Arrays.asList("12345", "67890");
+            zipCodeClient.postZipCodes(newZipCodes);
+        }
     }
 
     @After
