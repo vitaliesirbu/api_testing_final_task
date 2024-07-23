@@ -32,6 +32,7 @@ public class UserUploadTest {
 
     @After
     public void tearDown() throws Exception {
+
         zipCodeClient.close();
         userClient.close();
     }
@@ -45,14 +46,14 @@ public class UserUploadTest {
         List<User> usersToUpload = userClient.generateValidUsers(3, availableZipCodes);
         File jsonFile = JsonFileUtil.createJsonFile(usersToUpload, "users");
 
-
         CloseableHttpResponse response = userClient.uploadUsers(jsonFile);
 
-        addPayloadToReport("Response", EntityUtils.toString(response.getEntity()));
+        String responseBody = EntityUtils.toString(response.getEntity());
+
+        addPayloadToReport("Response", responseBody);
 
         Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
 
-        String responseBody = EntityUtils.toString(response.getEntity());
         String[] parts = responseBody.split("=");
         Assert.assertEquals("Unexpected response format", 2, parts.length);
         int uploadedCount = Integer.parseInt(parts[1].trim());
