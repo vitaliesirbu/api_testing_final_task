@@ -13,7 +13,8 @@ on:
         default: 'Manual Run'
 
 permissions:
-    contents: write
+  checks: write
+  pull-requests: write
 
 jobs:
   test:
@@ -88,7 +89,4 @@ jobs:
             test-results/**/*.xml
             test-results/**/*.trx
             test-results/**/*.json    
-            
-            permissions:
-              checks: write
-              pull-requests: write     
+           
