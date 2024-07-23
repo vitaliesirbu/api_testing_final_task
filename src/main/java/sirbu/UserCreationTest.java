@@ -118,9 +118,15 @@ public class UserCreationTest {
     @Test
     @SneakyThrows
     @Issue("User Creation")
-    @Step("Create a dublicate user")
+    @Step("Create a duplicate user")
     public void testCreateUserWithExistingNameAndSex() {
-        User initialUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeClient.getZipCodes().get(0));
+        List<String> availableZipCodes = zipCodeClient.getZipCodes();
+
+        if (availableZipCodes.size() < 2) {
+            throw new IllegalStateException("Not enough zip codes available for this test. Need at least 2.");
+        }
+
+        User initialUser = UserDataGenerator.generateUniqueUserDataWithZipCode(availableZipCodes.get(0));
 
         addPayloadToReport("Initial user creation payload", initialUser);
 
@@ -128,7 +134,7 @@ public class UserCreationTest {
         Assert.assertEquals(HttpStatus.SC_CREATED, initialResponse.getStatusLine().getStatusCode());
 
         User duplicateUser = new User(initialUser.getName(), initialUser.getSex(),
-                initialUser.getAge() + 5, zipCodeClient.getZipCodes().get(1));
+                initialUser.getAge() + 5, availableZipCodes.get(1));
 
         addPayloadToReport("Duplicate user creation payload", duplicateUser);
 
@@ -151,8 +157,7 @@ public class UserCreationTest {
         Assert.assertFalse("Duplicate user should not have been added to the application", duplicateUserFound);
 
         addPayloadToReport("Updated users list", users);
-
-        }
+    }
 
     @Attachment(value = "{attachmentName}", type = "application/json")
     private void addPayloadToReport(String attachmentName, Object payload) {
