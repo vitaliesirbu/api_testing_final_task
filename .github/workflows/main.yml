@@ -45,7 +45,7 @@ jobs:
           maven-version: 3.9.3
 
       - name: Build and run tests with Maven
-        run: mvn test
+        run: mvn clean test
         continue-on-error: true
 
       - name: Check test results

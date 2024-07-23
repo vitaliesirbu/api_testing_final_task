@@ -44,7 +44,7 @@ public class ZipCodeTest {
 
         List<String> zipCodesList = zipCodeClient.getZipCodes();
 
-        addPayloadToReport("Zip Codes List", zipCodesList);;
+        addPayloadToReport("Zip Codes List", zipCodesList);
 
         Assert.assertTrue(!zipCodesList.isEmpty());
 
