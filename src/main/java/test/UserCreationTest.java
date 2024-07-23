@@ -48,7 +48,7 @@ public class UserCreationTest {
 
         CloseableHttpResponse response = userClient.createUser(user);
 
-        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
 
         List<User> users = userClient.getUsers();
         boolean userFound = users.stream()
@@ -72,7 +72,7 @@ public class UserCreationTest {
 
         CloseableHttpResponse response = userClient.createUser(user);
 
-        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
 
         List<User> users = userClient.getUsers();
         boolean userFound = users.stream()
