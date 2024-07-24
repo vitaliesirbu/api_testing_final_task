@@ -80,4 +80,5 @@ jobs:
             test-results/**/*.xml
             test-results/**/*.trx
             test-results/**/*.json    
+            target/surefire-reports/*.xml
            
