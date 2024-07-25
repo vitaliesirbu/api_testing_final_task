@@ -85,7 +85,7 @@ jobs:
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: allure-results
+          publish_branch: gh-pages
           publish_dir: allure-history
 
       - name: Publish Test Results
