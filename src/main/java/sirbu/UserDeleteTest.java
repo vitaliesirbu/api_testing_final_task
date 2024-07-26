@@ -7,6 +7,7 @@ import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -33,15 +34,9 @@ public class UserDeleteTest {
         String zipCode = initialZipCodes.get(0);
 
         testUser = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCode);
-        CloseableHttpResponse response = userClient.createUser(testUser);
+        Response response = userClient.createUser(testUser);
 
-        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        zipCodeClient.close();
-        userClient.close();
+        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusCode());
     }
 
     @Test
@@ -50,9 +45,9 @@ public class UserDeleteTest {
     @Step("Delete a user using all available fields")
     public void testDeleteUserSuccessfully() {
 
-        CloseableHttpResponse response = userClient.deleteUser(testUser);
+        Response response = userClient.deleteUser(testUser);
 
-        Assert.assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatusCode());
 
         List<User> users = userClient.getUsers();
         Assert.assertFalse(users.stream().anyMatch(u -> u.getName().equals(testUser.getName())));
@@ -71,9 +66,9 @@ public class UserDeleteTest {
     public void testDeleteUserWithRequiredFieldsOnly() {
 
         User userToDelete = new User(testUser.getName(), testUser.getSex(), 0, "");
-        CloseableHttpResponse response = userClient.deleteUser(userToDelete);
+        Response response = userClient.deleteUser(userToDelete);
 
-        Assert.assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatusCode());
 
         List<User> users = userClient.getUsers();
         Assert.assertFalse(users.stream().anyMatch(u -> u.getName().equals(testUser.getName())));
@@ -92,9 +87,9 @@ public class UserDeleteTest {
 
         User incompleteUser = new User(testUser.getName(), null, 0, "");
 
-        CloseableHttpResponse response = userClient.deleteUser(incompleteUser);
+        Response response = userClient.deleteUser(incompleteUser);
 
-        Assert.assertEquals(HttpStatus.SC_CONFLICT, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_CONFLICT, response.getStatusCode());
 
         List<User> users = userClient.getUsers();
         Assert.assertTrue(users.stream().anyMatch(u -> u.getName().equals(testUser.getName())));

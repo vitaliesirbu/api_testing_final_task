@@ -59,6 +59,7 @@ jobs:
             ${{ github.workspace }}/target/allure-results
             ${{ github.workspace }}/allure-results
 
+
       - name: Download test results
         uses: actions/download-artifact@v4
         with:
@@ -97,4 +98,4 @@ jobs:
             test-results/**/*.trx
             test-results/**/*.json
             target/surefire-reports/*.xml
-           
+

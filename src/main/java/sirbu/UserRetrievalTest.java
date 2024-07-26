@@ -6,6 +6,7 @@ import com.coherentsolutions.training.automation.api.sirbu.Utils.UserDataGenerat
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
@@ -29,10 +30,6 @@ public class UserRetrievalTest {
         userClient.createUsers(predefinedUsers);
     }
 
-    @After
-    public void tearDown() throws Exception {userClient.close();
-
-    }
 
     private List<User> createPredefinedUsers() {
         return IntStream.range(0, 10)
@@ -44,9 +41,9 @@ public class UserRetrievalTest {
     @Issue("User Retrieval")
     @Step("Get all available users")
     public void testGetAllUsers() {
-        CloseableHttpResponse response = userClient.getUsers(null, null, null);
+        Response response = userClient.getUsers(null, null, null);
 
-        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
         List<User> retrievedUsers = userClient.getUsers();
         Assert.assertTrue("Retrieved users should contain all predefined users",
@@ -60,9 +57,9 @@ public class UserRetrievalTest {
     @Step("Get all users older than a certain age")
     public void testGetUsersOlderThan() {
         int olderThan = 30;
-        CloseableHttpResponse response = userClient.getUsers(olderThan, null, null);
+        Response response = userClient.getUsers(olderThan, null, null);
 
-        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
         List<User> filteredUsers = userClient.getUsersList(olderThan, null, null);
         Assert.assertFalse("Filtered user list should not be empty", filteredUsers.isEmpty());
@@ -79,9 +76,9 @@ public class UserRetrievalTest {
     public void testGetUsersYoungerThan() {
 
         int youngerThan = 25;
-        CloseableHttpResponse response = userClient.getUsers(null, null, youngerThan);
+        Response response = userClient.getUsers(null, null, youngerThan);
 
-        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
         List<User> filteredUsers = userClient.getUsersList(null, null, youngerThan);
         Assert.assertFalse("Filtered user list should not be empty", filteredUsers.isEmpty());
@@ -97,9 +94,9 @@ public class UserRetrievalTest {
     @Step("Get all users filtered by sex parameter")
     public void testGetUsersBySex() {
         String sex = "FEMALE";
-        CloseableHttpResponse response = userClient.getUsers(null, sex, null);
+        Response response = userClient.getUsers(null, sex, null);
 
-        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
         List<User> filteredUsers = userClient.getUsersList(null, sex, null);
         Assert.assertFalse("Filtered user list should not be empty", filteredUsers.isEmpty());

@@ -9,9 +9,8 @@ import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
 import lombok.SneakyThrows;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,12 +36,6 @@ public class UserCreationTest {
         }
     }
 
-    @After
-    public void tearDown() throws Exception{
-        zipCodeClient.close();
-        userClient.close();
-    }
-
     @Test
     @SneakyThrows
     @Issue("User Creation")
@@ -54,9 +47,9 @@ public class UserCreationTest {
 
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(zipCodeToUse);
 
-        CloseableHttpResponse response = userClient.createUser(user);
+        Response response = userClient.createUser(user);
 
-        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusCode());
 
         List<User> users = userClient.getUsers();
         boolean userFound = users.stream()
@@ -78,9 +71,9 @@ public class UserCreationTest {
 
         User user = UserDataGenerator.generateRequiredUserData();
 
-        CloseableHttpResponse response = userClient.createUser(user);
+        Response response = userClient.createUser(user);
 
-        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusCode());
 
         List<User> users = userClient.getUsers();
         boolean userFound = users.stream()
@@ -104,11 +97,11 @@ public class UserCreationTest {
         User user = UserDataGenerator.generateUniqueUserDataWithZipCode(unavailableZipCode);
 
 
-        CloseableHttpResponse response = userClient.createUser(user);
+        Response response = userClient.createUser(user);
 
         Assert.assertEquals("Expected 424 Failed Dependency for incorrect zip code",
                 HttpStatus.SC_FAILED_DEPENDENCY,
-                response.getStatusLine().getStatusCode());
+                response.getStatusCode());
 
         List<User> users = userClient.getUsers();
         boolean userFound = users.stream()
@@ -138,19 +131,19 @@ public class UserCreationTest {
 
         addPayloadToReport("Initial user creation payload", initialUser);
 
-        CloseableHttpResponse initialResponse = userClient.createUser(initialUser);
-        Assert.assertEquals(HttpStatus.SC_CREATED, initialResponse.getStatusLine().getStatusCode());
+        Response initialResponse = userClient.createUser(initialUser);
+        Assert.assertEquals(HttpStatus.SC_CREATED, initialResponse.getStatusCode());
 
         User duplicateUser = new User(initialUser.getName(), initialUser.getSex(),
                 initialUser.getAge() + 5, availableZipCodes.get(1));
 
         addPayloadToReport("Duplicate user creation payload", duplicateUser);
 
-        CloseableHttpResponse duplicateResponse = userClient.createUser(duplicateUser);
+        Response duplicateResponse = userClient.createUser(duplicateUser);
 
         Assert.assertEquals("Expected 400 Bad Request for duplicate name and sex",
                 HttpStatus.SC_BAD_REQUEST,
-                duplicateResponse.getStatusLine().getStatusCode());
+                duplicateResponse.getStatusCode());
 
         List<User> users = userClient.getUsers();
         long count = users.stream()
