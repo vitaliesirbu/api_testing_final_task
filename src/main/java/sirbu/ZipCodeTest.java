@@ -1,10 +1,12 @@
 package sirbu;
 
+import com.coherentsolutions.training.automation.api.sirbu.AuthProvider;
 import com.coherentsolutions.training.automation.api.sirbu.Utils.ZipCodeGenerator;
 import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -16,6 +18,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.restassured.RestAssured.given;
+
 public class ZipCodeTest {
 
     private ZipCodeClient zipCodeClient;
@@ -25,25 +29,22 @@ public class ZipCodeTest {
     }
 
 
-    @After
-    @SneakyThrows
-    public void tearDown() {
-        zipCodeClient.close();
-    }
-
     @Test
     @SneakyThrows
     @Issue("Zip Code")
     @Step("Get all available zip codes")
     public void testGetZipCodes() {
-        CloseableHttpResponse response = zipCodeClient.getZipCodesResponse();
-        int statusCode = response.getStatusLine().getStatusCode();
+        Response response = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl());
+
+        int statusCode = response.getStatusCode();
         Assert.assertEquals(200, statusCode);
 
-        String responseBody = EntityUtils.toString(response.getEntity());
+        String responseBody = response.getBody().asString();
         addPayloadToReport("Response", responseBody);
 
-        List<String> zipCodesList = zipCodeClient.getZipCodes();
+        List<String> zipCodesList = response.jsonPath().getList("");
 
         addPayloadToReport("Zip Codes List", zipCodesList);
 
@@ -56,8 +57,12 @@ public class ZipCodeTest {
     @Issue("Zip Code")
     @Step("Add new zip codes")
     public void testPostZipCodes() {
+        List<String> availableZipCodes = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl())
+                .jsonPath()
+                .getList("");
 
-        List<String> availableZipCodes = zipCodeClient.getZipCodes();
         List<String> requestBody = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             requestBody.add(ZipCodeGenerator.generateUnavailableZipCode(availableZipCodes));
@@ -65,15 +70,23 @@ public class ZipCodeTest {
 
         addPayloadToReport("Request Body", requestBody);
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
+        Response response = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getWriteToken())
+                .header("Content-Type", "application/json")
+                .body(requestBody)
+                .post(zipCodeClient.getZipCodesExpandUrl());
 
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getStatusCode();
         Assert.assertEquals(201, statusCode);
 
-        String responseBody = EntityUtils.toString(response.getEntity());
+        String responseBody = response.getBody().asString();
         addPayloadToReport("Response", responseBody);
 
-        List<String> zipCodesList = zipCodeClient.getZipCodes();
+        List<String> zipCodesList = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl())
+                .jsonPath()
+                .getList("");
 
         addPayloadToReport("Updated Zip Codes List", zipCodesList);
 
@@ -88,7 +101,12 @@ public class ZipCodeTest {
     @Issue("Zip Code")
     @Step("Add duplicated zip codes")
     public void testExpandZipCodesWithDuplications() {
-        List<String> availableZipCodes = zipCodeClient.getZipCodes();
+        List<String> availableZipCodes = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl())
+                .jsonPath()
+                .getList("");
+
         List<String> requestBody = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             requestBody.add(ZipCodeGenerator.generateUnavailableZipCode(availableZipCodes));
@@ -97,15 +115,23 @@ public class ZipCodeTest {
 
         addPayloadToReport("Request Body", requestBody);
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
+        Response response = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getWriteToken())
+                .header("Content-Type", "application/json")
+                .body(requestBody)
+                .post(zipCodeClient.getZipCodesExpandUrl());
 
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getStatusCode();
         Assert.assertEquals(201, statusCode);
 
-        String responseBody = EntityUtils.toString(response.getEntity());
+        String responseBody = response.getBody().asString();
         addPayloadToReport("Response", responseBody);
 
-        List<String> zipCodesList = zipCodeClient.getZipCodes();
+        List<String> zipCodesList = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl())
+                .jsonPath()
+                .getList("");
 
         addPayloadToReport("Updated Zip Codes List", zipCodesList);
 
@@ -119,27 +145,37 @@ public class ZipCodeTest {
     @Issue("Zip Code")
     @Step("Check that no duplications between available zip codes and already used zip codes are added")
     public void testExpandZipCodesWithDuplicationsBetweenAvailableZip() {
+        List<String> availableZipCodes = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl())
+                .jsonPath()
+                .getList("");
 
-        List<String> availableZipCodes = zipCodeClient.getZipCodes();
         List<String> requestBody = new ArrayList<>();
-
         for (int i = 0; i < 2; i++) {
             requestBody.add(ZipCodeGenerator.generateUnavailableZipCode(availableZipCodes));
         }
-
         requestBody.add(requestBody.get(0));
 
         addPayloadToReport("Request Body", requestBody);
 
-        CloseableHttpResponse response = zipCodeClient.postZipCodes(requestBody);
+        Response response = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getWriteToken())
+                .header("Content-Type", "application/json")
+                .body(requestBody)
+                .post(zipCodeClient.getZipCodesExpandUrl());
 
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getStatusCode();
         Assert.assertEquals(201, statusCode);
 
-        String responseBody = EntityUtils.toString(response.getEntity());
+        String responseBody = response.getBody().asString();
         addPayloadToReport("Response", responseBody);
 
-        List<String> zipCodesList = zipCodeClient.getZipCodes();
+        List<String> zipCodesList = given()
+                .header("Authorization", "Bearer " + AuthProvider.getInstance().getReadToken())
+                .get(zipCodeClient.getZipCodesUrl())
+                .jsonPath()
+                .getList("");
 
         addPayloadToReport("Updated Zip Codes List", zipCodesList);
 

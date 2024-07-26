@@ -9,6 +9,7 @@ import com.coherentsolutions.training.automation.api.sirbu.ZipCodeClient;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import lombok.SneakyThrows;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,22 +36,16 @@ public class UserUpdateTest {
 
         if (availableZipCodes.size() < 2) {
             String newZipCode = zipCodeClient.generateNewZipCode(availableZipCodes.get(0));
-            CloseableHttpResponse response = zipCodeClient.postZipCodes(List.of(newZipCode));
-            Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+            Response response = zipCodeClient.postZipCodes(List.of(newZipCode));
+            Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusCode());
             availableZipCodes.add(newZipCode);
         }
 
         initialUser = UserDataGenerator.generateUniqueUserDataWithZipCode(availableZipCodes.get(0));
-        CloseableHttpResponse response = userClient.createUser(initialUser);
-        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+        Response response = userClient.createUser(initialUser);
+        Assert.assertEquals(HttpStatus.SC_CREATED, response.getStatusCode());
 
         addPayloadToReport("Initial User", initialUser);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        zipCodeClient.close();
-        userClient.close();
     }
 
     @Test
@@ -73,9 +68,9 @@ public class UserUpdateTest {
 
         addPayloadToReport("Update DTO", updateDTO);
 
-        CloseableHttpResponse response = userClient.updateUser(updateDTO);
+        Response response = userClient.updateUser(updateDTO);
 
-        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
         User retrievedUser = userClient.getUserByName(newName);
 
@@ -109,9 +104,9 @@ public class UserUpdateTest {
 
         addPayloadToReport("Update DTO with Unavailable Zip Code", updateDTO);
 
-        CloseableHttpResponse response = userClient.updateUser(updateDTO);
+        Response response = userClient.updateUser(updateDTO);
 
-        Assert.assertEquals(HttpStatus.SC_FAILED_DEPENDENCY, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_FAILED_DEPENDENCY, response.getStatusCode());
 
         User retrievedUser = userClient.getUserByName(initialUser.getName());
 
@@ -153,9 +148,9 @@ public class UserUpdateTest {
 
         addPayloadToReport("Update DTO with Missing Required Field", updateDTO);
 
-        CloseableHttpResponse response = userClient.updateUser(updateDTO);
+        Response response = userClient.updateUser(updateDTO);
 
-        Assert.assertEquals(HttpStatus.SC_CONFLICT, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_CONFLICT, response.getStatusCode());
 
         User retrievedUser = userClient.getUserByName(initialUser.getName());
 
